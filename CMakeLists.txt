@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(UrhoxProject)
+project(UrhoxLib)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -11,11 +11,11 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-set(URHO3D_BUILD_DIR CACHE PATH "Urho3D Build directory")
-if ("${URHO3D_BUILD_DIR}" STREQUAL "")
-	message(FATAL_ERROR "URHO3D_BUILD_DIR variable is empty. Please set Urho3D build directory path.")
+set(URHO3D_HOME CACHE PATH "Urho3D Build directory")
+if ("${URHO3D_HOME}" STREQUAL "")
+	message(FATAL_ERROR "URHO3D_HOME variable is empty. Please set Urho3D build directory path.")
 endif()
-message(STATUS "Urho build directory : ${URHO3D_BUILD_DIR}")
+message(STATUS "Urho build directory : ${URHO3D_HOME}")
 
 include(global.cmake)
 
@@ -44,9 +44,9 @@ add_subdirectory(Sources)
 
 
 # Copy public headers to output directory
-
 COPY_HEADERS(Sources/ThirdParty/ImGui/ ${OUT_DIR_INCLUDE}/Urhox/ThirdParty/ImGui)
 COPY_HEADERS(Sources/ThirdParty/ImGuizmo/ ${OUT_DIR_INCLUDE}/Urhox/ThirdParty/ImGuizmo)
+COPY_HEADERS(Sources/ThirdParty/Spark/include/ ${OUT_DIR_INCLUDE}/Urhox/ThirdParty/Spark)
 COPY_HEADERS(Sources/Urhox/ ${OUT_DIR_INCLUDE}/Urhox/Urhox)
 
 

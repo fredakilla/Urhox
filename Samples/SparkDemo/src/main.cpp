@@ -1,9 +1,8 @@
 #include <Urho3D/Urho3DAll.h>
 
-#include <Urhox.h>
-#include <ImGui/imgui.h>
-#include "Spark/include/SPARK.h"
-#include "../Spark/Spark.h"
+#include <Urhox/Urhox.h>
+#include <ThirdParty/ImGui/imgui.h>
+#include <ThirdParty/Spark/SPARK.h>
 
 using namespace Urho3D;
 
@@ -65,11 +64,10 @@ private:
 ///     - How to build a new Spark Particles effect from scratch.
 ///     - Using Spark Particle files to load particles effects.
 ///     - Creating a 3D Scene with Spark Particles.
-class SparkParticles : public Application
+class SparkDemo : public Application
 {
 
 private:
-
     SPK::Ref<SPK::System> effectExplosion_;
     SPK::Ref<SPK::System> effectFountain_;
     Node* magicBallNode_;
@@ -81,10 +79,13 @@ private:
 
 public:
     /// Construct.
-    SparkParticles(Context* context) :
+    SparkDemo(Context* context) :
         Application(context)
     {
         context->RegisterFactory<FxMover>();
+
+        // register spark library with urho context
+        RegisterSparkLibrary(context_);
     }
 
     void Setup() override
@@ -112,13 +113,23 @@ public:
         SubscribeToEvents();
     }
 
-    /// Spawn an explosion effect at position.
+    /// Spawn an explosion effect at given position.
     void AddExplosion(Vector3 pos)
     {
+        // Create a new node.
+        Node* spkSystemNode = scene_->CreateChild("Explosion");
+        spkSystemNode->SetPosition(pos);
 
+        // Create SparkParticle component
+        SparkParticle* spkSystem = spkSystemNode->CreateComponent<SparkParticle>();
+        spkSystem->SetSystem(effectExplosion_);
+
+        // Initialize system to start effect.
+        spkSystem->GetSystem()->initialize();
     }
 
 private:
+
     /// Construct the scene content.
     void CreateScene()
     {
@@ -139,9 +150,9 @@ private:
 
         // There is 2 ways of using Spark Particles.
 
-        // 1. Build manually in memory a spark effect using code.
+        // 1. Build manually in memory a spark effect using c++ code.
 
-        // Create Spark effect from scratch
+        // Create simple Spark effect from scratch
         CreateFountainEffect();
 
         // Once effect is builded, assign it to a SparkParticleEffect and add it to the cache.
@@ -162,7 +173,8 @@ private:
         // Create a new child scene node and a create a SparkParticle component into it.
         // Set effect by loading a SparkParticleEffect resource.
         // Note1: SparkParticleEffect can load .xml or .spk files
-        // Note2: Spark effect .xml and .spk files can be created by exporting a manually builded effect or using a spark particle editor.
+        // Note2: Spark effect .xml and .spk files can be created by exporting a manually builded effect or
+        // using a spark particle editor.
 
 
         // Create some particles nodes.
@@ -307,8 +319,7 @@ private:
         if (input->GetKeyDown(KEY_D))
             cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 
-
-        // Add an explosion effect at random position when press space
+        // Add an explosion effect at random position when pressing space key
         if (input->GetKeyPress(KEY_SPACE))
         {
             AddExplosion(Vector3(Random(40.0f) - 20.0f, 3.0f, Random(40.0f) - 20.0f));
@@ -319,8 +330,8 @@ private:
     void SubscribeToEvents()
     {
         // Subscribe HandleUpdate() function for processing update events
-        SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(SparkParticles, HandleUpdate));
-
+        SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(SparkDemo, HandleUpdate));
+        SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(SparkDemo, HandleKeyDown));
     }
 
     /// Handle the logic update event.
@@ -335,139 +346,288 @@ private:
         MoveCamera(timeStep);
     }
 
-    /// Build an explosion effect.
-    void CreateExplosionEffect()
-    {
-
-    }
-
-    /// Build a fountain effect.
-    void CreateFountainEffect()
-    {
-
-    }
-};
-
-
-URHO3D_DEFINE_APPLICATION_MAIN(SparkParticles)
-
-
-
-
-
-
-
-
-
-#if 0
-class MyApp : public Application
-{
-    SharedPtr<Scene> _scene;
-
-public:
-
-    MyApp(Context* context) :
-        Application(context)
-    {
-        context->RegisterFactory<Rotator>();
-    }
-
-    void Setup() override
-    {
-        engineParameters_[EP_WINDOW_TITLE] = "Sample";
-        engineParameters_[EP_FULL_SCREEN] = false;
-        engineParameters_[EP_WINDOW_WIDTH] = 1280;
-        engineParameters_[EP_WINDOW_HEIGHT] = 720;
-        engineParameters_[EP_WINDOW_RESIZABLE] = true;
-    }
-
-    void Stop() override
-    {
-        // Perform optional cleanup after main loop has terminated
-        engine_->DumpResources(true);
-    }
-
-    void Start() override
-    {
-        context_->RegisterSubsystem(new SystemUI(context_));
-        context_->GetSubsystem<SystemUI>()->Start();
-
-        context_->RegisterSubsystem(new DebugHud(context_));
-        context_->GetSubsystem<DebugHud>()->ToggleAll();
-
-        ui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-        ui::GetIO().BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
-
-
-        // Seems like the mouse must be in cursor mode before creating the UI or it won't work.
-        GetSubsystem<Input>()->SetMouseVisible(true);
-        GetSubsystem<Input>()->SetMouseGrabbed(false);
-
-
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
-
-        _scene = new Scene(context_);
-        _scene->CreateComponent<Octree>();
-        //_scene->CreateComponent<DebugRenderer>();
-
-        Node* node = _scene->CreateChild("Box");
-        node->SetPosition(Vector3(0,0,0));
-        StaticModel* staticModel = node->CreateComponent<StaticModel>();
-        staticModel->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
-        staticModel->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
-
-        Rotator* rotator = node->CreateComponent<Rotator>();
-        rotator->SetRotationSpeed(Vector3(10.0f, 400.0f, 30.0f));
-
-        Node* lightNode = _scene->CreateChild("DirectionalLight");
-        lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f)); // The direction vector does not need to be normalized
-        auto* light = lightNode->CreateComponent<Light>();
-        light->SetLightType(LIGHT_DIRECTIONAL);
-
-        Node* nodeCamera = _scene->CreateChild("Camera");
-        nodeCamera->SetPosition(Vector3(0,1,-5));
-        Camera* camera = nodeCamera->CreateComponent<Camera>();
-        camera->SetFarClip(2000);
-
-        Renderer* renderer = GetSubsystem<Renderer>();
-        Viewport* viewport = new Viewport(context_, _scene, camera);
-        renderer->SetViewport(0, viewport);
-
-        // Called after engine initialization. Setup application & subscribe to events here
-        SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(MyApp, HandleKeyDown));
-        SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(MyApp, HandleUpdate));
-    }    
-
-    void HandleUpdate(StringHash eventType, VariantMap& eventData)
-    {
-        // Show ImGui test window
-        ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver);
-        ImGui::ShowDemoWindow();
-
-        // Create some ImGui controls to manage cube rotation
-        static float axis[] = { 0.0f, 10.0f, 0.0f };
-        ImGui::SetNextWindowSize(ImVec2(200,200), ImGuiCond_FirstUseEver);
-        ImGui::Begin("Cube rotation speed");
-        ImGui::SliderFloat3("Axis", axis, -200.0f, 200.0f);
-        ImGui::End();
-
-        Rotator* rotator = _scene->GetChild("Box")->GetComponent<Rotator>();
-        rotator->SetRotationSpeed(Vector3(axis));
-
-    }
-
-    void HandleKeyDown(StringHash eventType, VariantMap& eventData)
+    void HandleKeyDown(StringHash /*eventType*/, VariantMap& eventData)
     {
         using namespace KeyDown;
-        // Check for pressing ESC. Note the engine_ member variable for convenience access to the Engine object
+
         int key = eventData[P_KEY].GetInt();
-        if (key == KEY_ESCAPE)
-            engine_->Exit();
+
+        // Toggle console with F1
+        if (key == KEY_F1)
+            GetSubsystem<Console>()->Toggle();
+
+        // Toggle debug HUD with F2
+        else if (key == KEY_F2)
+            GetSubsystem<DebugHud>()->ToggleAll();
     }
+
+    /// Build a simple fountain effect from scratch using spark library
+    void CreateFountainEffect()
+    {
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+        SPK::Ref<SPK::System> system_ = SPK::System::create(true);
+        system_->setName("Test System");
+
+        // Renderer
+        SPK::Ref<SPK::URHO::Urho3DQuadRenderer> renderer = SPK::URHO::Urho3DQuadRenderer::create(context_);
+        renderer->setTexturingMode(SPK::TEXTURE_MODE_2D);
+        renderer->setScale(0.1f,0.1f);
+        renderer->setMaterial(cache->GetResource<Material>("Spark/Materials/SparkParticleAddAlpha.xml"));
+        renderer->setOrientation(SPK::OrientationPreset::CAMERA_PLANE_ALIGNED);
+
+        // Emitter
+        SPK::Ref<SPK::SphericEmitter> particleEmitter = SPK::SphericEmitter::create(SPK::Vector3D(0.0f,1.0f,0.0f),0.1f * M_PI, 0.1f * M_PI);
+        particleEmitter->setZone(SPK::Point::create(SPK::Vector3D(0.0f,0.015f,0.0f)));
+        particleEmitter->setFlow(300);
+        particleEmitter->setForce(1.5f,1.5f);
+
+        // Obstacle
+        SPK::Ref<SPK::Plane> groundPlane = SPK::Plane::create();
+        SPK::Ref<SPK::Obstacle> obstacle = SPK::Obstacle::create(groundPlane,0.9f,1.0f);
+        obstacle->setBouncingRatio(0.2f);
+        obstacle->setFriction(0.9f);
+
+        // Group
+        SPK::Ref<SPK::Group> particleGroup = system_->createGroup(10000);
+        particleGroup->addEmitter(particleEmitter);
+        particleGroup->addModifier(obstacle);
+        particleGroup->setRenderer(renderer);
+        particleGroup->addModifier(SPK::Gravity::create(SPK::Vector3D(0.0f,-1.0f,0.0f)));
+        particleGroup->setLifeTime(4.2f,4.5f);
+        particleGroup->setColorInterpolator(SPK::ColorSimpleInterpolator::create(0xFF880035,0xFF0050FF));
+        particleGroup->enableSorting(true);
+
+        // get a final copy af this effect.
+        effectFountain_ = SPK::SPKObject::copy(system_);
+    }
+
+    /// Build a more complex explosion effect from scratch using spark library
+    void CreateExplosionEffect()
+    {
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+        // Load base material
+        Material* baseMaterial = cache->GetResource<Material>("Materials/Particle.xml");
+
+        // Create material clones and set textures
+
+        SharedPtr<Material> textureExplosion = baseMaterial->Clone();
+        textureExplosion->SetTexture(TU_DIFFUSE, cache->GetResource<Texture2D>("Spark/Textures/explosion.bmp"));
+
+        SharedPtr<Material> textureFlash = baseMaterial->Clone();
+        textureFlash->SetTexture(TU_DIFFUSE, cache->GetResource<Texture2D>("Spark/Textures/flash.bmp"));
+
+        SharedPtr<Material> textureSpark1 = baseMaterial->Clone();
+        textureSpark1->SetTexture(TU_DIFFUSE, cache->GetResource<Texture2D>("Spark/Textures/Arrow.png"));
+
+        SharedPtr<Material> textureSpark2 = baseMaterial->Clone();
+        textureSpark2->SetTexture(TU_DIFFUSE, cache->GetResource<Texture2D>("Spark/Textures/point.bmp"));
+
+        SharedPtr<Material> textureWave = baseMaterial->Clone();
+        textureWave->SetTexture(TU_DIFFUSE, cache->GetResource<Texture2D>("Spark/Textures/wave.bmp"));
+
+
+        ///////////////
+        // Renderers //
+        ///////////////
+
+        // smoke renderer
+        SPK::Ref<SPK::URHO::Urho3DQuadRenderer> smokeRenderer = SPK::URHO::Urho3DQuadRenderer::create(context_);
+        smokeRenderer->setTexturingMode(SPK::TEXTURE_MODE_2D);
+        smokeRenderer->setMaterial(textureExplosion);
+        smokeRenderer->setAtlasDimensions(2,2); // uses 4 different patterns in the texture
+        smokeRenderer->setShared(true);
+
+        // flame renderer
+        SPK::Ref<SPK::URHO::Urho3DQuadRenderer> flameRenderer = SPK::URHO::Urho3DQuadRenderer::create(context_);
+        flameRenderer->setTexturingMode(SPK::TEXTURE_MODE_2D);
+        flameRenderer->setMaterial(textureExplosion);
+        flameRenderer->setAtlasDimensions(2,2);
+        flameRenderer->setShared(true);
+
+        // flash renderer
+        SPK::Ref<SPK::URHO::Urho3DQuadRenderer> flashRenderer = SPK::URHO::Urho3DQuadRenderer::create(context_);
+        flashRenderer->setTexturingMode(SPK::TEXTURE_MODE_2D);
+        flashRenderer->setMaterial(textureFlash);
+        flashRenderer->setShared(true);
+
+        // spark 1 renderer
+        SPK::Ref<SPK::URHO::Urho3DQuadRenderer> spark1Renderer = SPK::URHO::Urho3DQuadRenderer::create(context_);
+        spark1Renderer->setTexturingMode(SPK::TEXTURE_MODE_2D);
+        spark1Renderer->setMaterial(textureSpark1);
+        spark1Renderer->setOrientation(SPK::DIRECTION_ALIGNED); // sparks are oriented function of their velocity
+        spark1Renderer->setScale(1.05f,1.0f); // thin rectangles
+        spark1Renderer->setShared(true);
+
+        // spark 2 renderer
+        SPK::Ref<SPK::URHO::Urho3DQuadRenderer> spark2Renderer = SPK::URHO::Urho3DQuadRenderer::create(context_);
+        spark2Renderer->setTexturingMode(SPK::TEXTURE_MODE_2D);
+        spark2Renderer->setMaterial(textureSpark2);
+        spark2Renderer->setShared(true);
+
+        // wave renderer
+        SPK::Ref<SPK::URHO::Urho3DQuadRenderer> waveRenderer = SPK::URHO::Urho3DQuadRenderer::create(context_);
+        waveRenderer->setTexturingMode(SPK::TEXTURE_MODE_2D);
+        waveRenderer->setMaterial(textureWave);
+        waveRenderer->setAlphaTestThreshold(0.0f);
+        waveRenderer->setOrientation(SPK::FIXED_ORIENTATION); // the orientation is fixed
+        waveRenderer->lookVector.set(0.0f,1.0f,0.0f);
+        waveRenderer->upVector.set(1.0f,0.0f,0.0f); // we dont really care about the up axis
+        waveRenderer->setShared(true);
+
+        //////////////
+        // Emitters //
+        //////////////
+
+        // This zone will be used by several emitters
+        SPK::Ref<SPK::Sphere> explosionSphere = SPK::Sphere::create(SPK::Vector3D(0.0f,0.0f,0.0f),0.4f);
+
+        // smoke emitter
+        SPK::Ref<SPK::RandomEmitter> smokeEmitter = SPK::RandomEmitter::create();
+        smokeEmitter->setZone(SPK::Sphere::create(SPK::Vector3D(0.0f,0.0f,0.0f),0.6f),false);
+        smokeEmitter->setTank(15);
+        smokeEmitter->setFlow(-1);
+        smokeEmitter->setForce(0.02f,0.04f);
+
+        // flame emitter
+        SPK::Ref<SPK::NormalEmitter> flameEmitter = SPK::NormalEmitter::create();
+        flameEmitter->setZone(explosionSphere);
+        flameEmitter->setTank(15);
+        flameEmitter->setFlow(-1);
+        flameEmitter->setForce(0.06f,0.1f);
+
+        // flash emitter
+        SPK::Ref<SPK::StaticEmitter> flashEmitter = SPK::StaticEmitter::create();
+        flashEmitter->setZone(SPK::Sphere::create(SPK::Vector3D(0.0f,0.0f,0.0f),0.1f));
+        flashEmitter->setTank(3);
+        flashEmitter->setFlow(-1);
+
+        // spark 1 emitter
+        SPK::Ref<SPK::NormalEmitter> spark1Emitter = SPK::NormalEmitter::create();
+        spark1Emitter->setZone(explosionSphere);
+        spark1Emitter->setTank(20);
+        spark1Emitter->setFlow(-1);
+        spark1Emitter->setForce(2.0f,3.0f);
+        spark1Emitter->setInverted(true);
+
+        // spark 2 emitter
+        SPK::Ref<SPK::NormalEmitter> spark2Emitter = SPK::NormalEmitter::create();
+        spark2Emitter->setZone(explosionSphere);
+        spark2Emitter->setTank(400);
+        spark2Emitter->setFlow(-1);
+        spark2Emitter->setForce(0.4f,1.0f);
+        spark2Emitter->setInverted(true);
+
+        // wave emitter
+        SPK::Ref<SPK::StaticEmitter> waveEmitter = SPK::StaticEmitter::create();
+        waveEmitter->setZone(SPK::Point::create());
+        waveEmitter->setTank(1);
+        waveEmitter->setFlow(-1);
+
+        ////////////
+        // Groups //
+        ////////////
+
+        effectExplosion_ = SPK::System::create(false); // not initialized at start, will be when spawned.
+        effectExplosion_->setName("Explosion");
+
+        SPK::Ref<SPK::ColorGraphInterpolator> colorInterpolator;
+        SPK::Ref<SPK::FloatGraphInterpolator> paramInterpolator;
+
+        // smoke group
+        colorInterpolator = SPK::ColorGraphInterpolator::create();
+        colorInterpolator->addEntry(0.0f,0x33333300);
+        colorInterpolator->addEntry(0.4f,0x33333366,0x33333399);
+        colorInterpolator->addEntry(0.6f,0x33333366,0x33333399);
+        colorInterpolator->addEntry(1.0f,0x33333300);
+
+        SPK::Ref<SPK::Group> smokeGroup = effectExplosion_->createGroup(15);
+        smokeGroup->setName("Smoke");
+        smokeGroup->setPhysicalRadius(0.0f);
+        smokeGroup->setLifeTime(2.5f,3.0f);
+        smokeGroup->setRenderer(smokeRenderer);
+        smokeGroup->addEmitter(smokeEmitter);
+        smokeGroup->setColorInterpolator(colorInterpolator);
+        smokeGroup->setParamInterpolator(SPK::PARAM_SCALE,SPK::FloatRandomInterpolator::create(0.3f,0.4f,0.5f,0.7f));
+        smokeGroup->setParamInterpolator(SPK::PARAM_TEXTURE_INDEX,SPK::FloatRandomInitializer::create(0.0f,4.0f));
+        smokeGroup->setParamInterpolator(SPK::PARAM_ANGLE,SPK::FloatRandomInterpolator::create(0.0f,M_PI * 0.5f,0.0f,M_PI * 0.5f));
+        smokeGroup->addModifier(SPK::Gravity::create(SPK::Vector3D(0.0f,0.05f,0.0f)));
+
+        // flame group
+        colorInterpolator = SPK::ColorGraphInterpolator::create();
+        colorInterpolator->addEntry(0.0f,0xFF8033FF);
+        colorInterpolator->addEntry(0.5f,0x995933FF);
+        colorInterpolator->addEntry(1.0f,0x33333300);
+
+        paramInterpolator = SPK::FloatGraphInterpolator::create();
+        paramInterpolator->addEntry(0.0f,0.125f);
+        paramInterpolator->addEntry(0.02f,0.3f,0.4f);
+        paramInterpolator->addEntry(1.0f,0.5f,0.7f);
+
+        SPK::Ref<SPK::Group> flameGroup = effectExplosion_->createGroup(15);
+        flameGroup->setName("Flame");
+        flameGroup->setLifeTime(1.5f,2.0f);
+        flameGroup->setRenderer(flameRenderer);
+        flameGroup->addEmitter(flameEmitter);
+        flameGroup->setColorInterpolator(colorInterpolator);
+        flameGroup->setParamInterpolator(SPK::PARAM_SCALE,paramInterpolator);
+        flameGroup->setParamInterpolator(SPK::PARAM_TEXTURE_INDEX,SPK::FloatRandomInitializer::create(0.0f,4.0f));
+        flameGroup->setParamInterpolator(SPK::PARAM_ANGLE,SPK::FloatRandomInterpolator::create(0.0f,M_PI * 0.5f,0.0f,M_PI * 0.5f));
+
+        // flash group
+        paramInterpolator = SPK::FloatGraphInterpolator::create();
+        paramInterpolator->addEntry(0.0f,0.1f);
+        paramInterpolator->addEntry(0.25f,0.5f,1.0f);
+
+        SPK::Ref<SPK::Group> flashGroup = effectExplosion_->createGroup(3);
+        flashGroup->setName("Flash");
+        flashGroup->setLifeTime(0.2f,0.2f);
+        flashGroup->addEmitter(flashEmitter);
+        flashGroup->setRenderer(flashRenderer);
+        flashGroup->setColorInterpolator(SPK::ColorSimpleInterpolator::create(0xFFFFFFFF,0xFFFFFF00));
+        flashGroup->setParamInterpolator(SPK::PARAM_SCALE,paramInterpolator);
+        flashGroup->setParamInterpolator(SPK::PARAM_ANGLE,SPK::FloatRandomInitializer::create(0.0f,2.0f * M_PI));
+
+        // spark 1 group
+        SPK::Ref<SPK::Group> spark1Group = effectExplosion_->createGroup(20);
+        spark1Group->setName("Spark 1");
+        spark1Group->setPhysicalRadius(0.0f);
+        spark1Group->setLifeTime(0.2f,1.0f);
+        spark1Group->addEmitter(spark1Emitter);
+        spark1Group->setRenderer(spark1Renderer);
+        spark1Group->setColorInterpolator(SPK::ColorSimpleInterpolator::create(0xFFFFFFFF,0xFFFFFF00));
+        spark1Group->setParamInterpolator(SPK::PARAM_SCALE,SPK::FloatRandomInitializer::create(0.1f,0.2f));
+        spark1Group->addModifier(SPK::Gravity::create(SPK::Vector3D(0.0f,-0.75f,0.0f)));
+
+        // spark 2 group
+        SPK::Ref<SPK::Group> spark2Group = effectExplosion_->createGroup(400);
+        spark2Group->setName("Spark 2");
+        spark2Group->setGraphicalRadius(0.01f);
+        spark2Group->setLifeTime(1.0f,3.0f);
+        spark2Group->addEmitter(spark2Emitter);
+        spark2Group->setRenderer(spark2Renderer);
+        spark2Group->setColorInterpolator(SPK::ColorRandomInterpolator::create(0xFFFFB2FF,0xFFFFB2FF,0xFF4C4C00,0xFFFF4C00));
+        spark2Group->setParamInterpolator(SPK::PARAM_MASS,SPK::FloatRandomInitializer::create(0.5f,2.5f));
+        spark2Group->addModifier(SPK::Gravity::create(SPK::Vector3D(0.0f,-0.1f,0.0f)));
+        spark2Group->addModifier(SPK::Friction::create(0.4f));
+
+        // wave group
+        paramInterpolator = SPK::FloatGraphInterpolator::create();
+        paramInterpolator->addEntry(0.0f,0.0f);
+        paramInterpolator->addEntry(0.2f,0.0f);
+        paramInterpolator->addEntry(1.0f,3.0f);
+
+        SPK::Ref<SPK::Group> waveGroup = effectExplosion_->createGroup(1);
+        waveGroup->setName("Wave");
+        waveGroup->setLifeTime(0.8f,0.8f);
+        waveGroup->addEmitter(waveEmitter);
+        waveGroup->setRenderer(waveRenderer);
+        waveGroup->setColorInterpolator(SPK::ColorSimpleInterpolator::create(0xFFFFFF20,0xFFFFFF00));
+        waveGroup->setParamInterpolator(SPK::PARAM_SCALE,paramInterpolator);
+    }
+
 };
 
-URHO3D_DEFINE_APPLICATION_MAIN(MyApp)
 
-#endif
-
-
+URHO3D_DEFINE_APPLICATION_MAIN(SparkDemo)

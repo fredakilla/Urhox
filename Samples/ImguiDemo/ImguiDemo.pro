@@ -24,7 +24,7 @@ SOURCES += \
 linux {
 
     PRE_TARGETDEPS += $$URHOX_OUTPUT/lib/liburhoxcore.a
-    LIBS += -L$$URHOX_OUTPUT/lib/ -lurhoxcore -limgui -limguizmo
+    LIBS += -L$$URHOX_OUTPUT/lib/ -lurhoxcore -limgui -limguizmo -lspark
     LIBS += -L$${URHO3D_HOME}/lib -lUrho3D
     LIBS += -lXi -ldl  -lpthread -lGL -lGLU -lX11
 }

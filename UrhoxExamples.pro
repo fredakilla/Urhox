@@ -5,5 +5,5 @@ TEMPLATE = subdirs
 CONFIG = ordered
 
 SUBDIRS += \
-    #Sources/Urhox.pro \
-    Samples/Samples.pro
+    Samples/ImguiDemo/ImguiDemo.pro \
+    Samples/SparkDemo/SparkDemo.pro
