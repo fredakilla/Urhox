@@ -1,5 +1,4 @@
 URHO3D_HOME = /home/fred/Dev/Urho3D/BUILD
-URHOX_OUTPUT = $$PWD/../../output
 
 TEMPLATE = app
 CONFIG += console
@@ -7,14 +6,15 @@ CONFIG -= app_bundle
 CONFIG -= qt c++14
 
 QMAKE_CLEAN += $$DESTDIR/$$TARGET
-DESTDIR = $$URHOX_OUTPUT/bin
+DESTDIR = $$PWD/../../build
 
 DEFINES += URHO3D_64BIT URHO3D_THREADING
 
 INCLUDEPATH += $${URHO3D_HOME}/include
 INCLUDEPATH += $${URHO3D_HOME}/include/Urho3D/ThirdParty
-INCLUDEPATH += $${URHOX_OUTPUT}/include/Urhox
-INCLUDEPATH += $${URHOX_OUTPUT}/include/Urhox/ThirdParty
+
+INCLUDEPATH += ../../Sources/Urhox
+INCLUDEPATH += ../../Sources/ThirdParty
 
 HEADERS += \
 
@@ -23,8 +23,8 @@ SOURCES += \
 
 linux {
 
-    PRE_TARGETDEPS += $$URHOX_OUTPUT/lib/liburhoxcore.a
-    LIBS += -L$$URHOX_OUTPUT/lib/ -lurhoxcore -limgui -limguizmo
+    PRE_TARGETDEPS += $${DESTDIR}/libUrhox.a
+    LIBS += -L$${DESTDIR} -lUrhox
     LIBS += -L$${URHO3D_HOME}/lib -lUrho3D
     LIBS += -lXi -ldl  -lpthread -lGL -lGLU -lX11
 }

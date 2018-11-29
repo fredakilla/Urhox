@@ -1,1 +1,4 @@
 build/
+BUILD/
+output/
+*.pro.user

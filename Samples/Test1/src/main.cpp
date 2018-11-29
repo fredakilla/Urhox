@@ -1,6 +1,6 @@
 #include <Urho3D/Urho3DAll.h>
 
-#include <Urhox.h>
+#include <Urhox/Urhox.h>
 #include <ImGui/imgui.h>
 
 using namespace Urho3D;
