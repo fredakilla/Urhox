@@ -95,6 +95,9 @@ public:
         engineParameters_[EP_WINDOW_WIDTH] = 1280;
         engineParameters_[EP_WINDOW_HEIGHT] = 720;
         engineParameters_[EP_WINDOW_RESIZABLE] = true;
+
+        // add additionnal "UrhoxData" resource path for spark data files
+        engineParameters_[EP_RESOURCE_PATHS] = "CoreData;Data;UrhoxData";
     }
 
     /// Setup after engine initialization and before running the main loop.
