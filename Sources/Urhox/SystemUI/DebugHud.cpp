@@ -59,7 +59,7 @@ DebugHudEx::DebugHudEx(Context* context) :
     profilerMaxDepth_(M_MAX_UNSIGNED),
     profilerInterval_(1000),
     useRendererStats_(true),
-    mode_(DEBUGHUD_SHOW_NONE),
+    mode_(DEBUGHUDEX_SHOW_NONE),
     fps_(0)
 {
     SetExtents();
@@ -95,18 +95,18 @@ void DebugHudEx::CycleMode()
 {
     switch (mode_.AsInteger())
     {
-    case DEBUGHUD_SHOW_NONE:
-        SetMode(DEBUGHUD_SHOW_STATS);
+    case DEBUGHUDEX_SHOW_NONE:
+        SetMode(DEBUGHUDEX_SHOW_STATS);
         break;
-    case DEBUGHUD_SHOW_STATS:
-        SetMode(DEBUGHUD_SHOW_MODE);
+    case DEBUGHUDEX_SHOW_STATS:
+        SetMode(DEBUGHUDEX_SHOW_MODE);
         break;
-    case DEBUGHUD_SHOW_MODE:
-        SetMode(DEBUGHUD_SHOW_ALL);
+    case DEBUGHUDEX_SHOW_MODE:
+        SetMode(DEBUGHUDEX_SHOW_ALL);
         break;
-    case DEBUGHUD_SHOW_ALL:
+    case DEBUGHUDEX_SHOW_ALL:
     default:
-        SetMode(DEBUGHUD_SHOW_NONE);
+        SetMode(DEBUGHUDEX_SHOW_NONE);
         break;
     }
 }
@@ -123,7 +123,7 @@ void DebugHudEx::Toggle(DebugHudModeFlags mode)
 
 void DebugHudEx::ToggleAll()
 {
-    Toggle(DEBUGHUD_SHOW_ALL);
+    Toggle(DEBUGHUDEX_SHOW_ALL);
 }
 
 void DebugHudEx::SetAppStats(const String& label, const Variant& stats)
@@ -161,7 +161,7 @@ void DebugHudEx::RenderUi(VariantMap& eventData)
     if (ui::Begin("DebugHud", nullptr, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoMove|
                                        ImGuiWindowFlags_NoInputs|ImGuiWindowFlags_NoScrollbar))
     {
-        if (mode_ & DEBUGHUD_SHOW_STATS)
+        if (mode_ & DEBUGHUDEX_SHOW_STATS)
         {
             // Update stats regardless of them being shown.
             if (fpsTimer_.GetMSec(false) > FPS_UPDATE_INTERVAL_MS)
@@ -195,7 +195,7 @@ void DebugHudEx::RenderUi(VariantMap& eventData)
                 ui::Text("%s %s", i->first_.CString(), i->second_.CString());
         }
 
-        if (mode_ & DEBUGHUD_SHOW_MODE)
+        if (mode_ & DEBUGHUDEX_SHOW_MODE)
         {
             auto& style = ui::GetStyle();
             ui::SetCursorPos({style.WindowPadding.x, ui::GetWindowSize().y - ui::GetStyle().WindowPadding.y - 10});

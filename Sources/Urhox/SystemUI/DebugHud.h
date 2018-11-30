@@ -31,10 +31,10 @@ namespace Urho3D
 
 enum DebugHudExMode : unsigned
 {
-    DEBUGHUD_SHOW_NONE = 0x0,
-    DEBUGHUD_SHOW_STATS = 0x1,
-    DEBUGHUD_SHOW_MODE = 0x2,
-    DEBUGHUD_SHOW_ALL = 0x7,
+    DEBUGHUDEX_SHOW_NONE = 0x0,
+    DEBUGHUDEX_SHOW_STATS = 0x1,
+    DEBUGHUDEX_SHOW_MODE = 0x2,
+    DEBUGHUDEX_SHOW_ALL = 0x7,
 };
 
 URHO3D_FLAGSET(DebugHudExMode, DebugHudModeFlags);
