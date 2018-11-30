@@ -15,12 +15,12 @@ Use cmake and URHO3D_HOME variable to the Urho3D build directory.
 
 example :
 
-'''
+```cpp
 mkdir BUILD
 cd BUILD
 cmake .. -DURHO3D_HOME=../../Urho3D/BUILD
 make -j12
-'''
+```
 
 Out library, samples and public headers are generated into the "output" directory.
 
