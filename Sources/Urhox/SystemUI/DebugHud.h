@@ -29,14 +29,15 @@
 namespace Urho3D
 {
 
-enum DebugHudMode : unsigned
+enum DebugHudExMode : unsigned
 {
     DEBUGHUD_SHOW_NONE = 0x0,
     DEBUGHUD_SHOW_STATS = 0x1,
     DEBUGHUD_SHOW_MODE = 0x2,
     DEBUGHUD_SHOW_ALL = 0x7,
 };
-URHO3D_FLAGSET(DebugHudMode, DebugHudModeFlags);
+
+URHO3D_FLAGSET(DebugHudExMode, DebugHudModeFlags);
 
 /// Displays rendering stats and profiling information.
 class URHO3D_API DebugHudEx : public Object
