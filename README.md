@@ -27,5 +27,5 @@ Out library, samples and public headers are generated into the "output" director
 ## Prepare samples data
 
 - Copy Urho3D "Data" and "CoreData" to output/Bin
-- Copy Bin/SparkData to output/Bin
+- Copy bin/SparkData to output/Bin
 
