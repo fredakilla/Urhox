@@ -3,5 +3,5 @@ add_subdirectory(ThirdParty/ImGui)
 add_subdirectory(ThirdParty/ImGuizmo)
 add_subdirectory(ThirdParty/Spark)
 
-# Urhox
+# Urhox core
 add_subdirectory(Urhox)

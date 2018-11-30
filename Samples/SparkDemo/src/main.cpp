@@ -90,7 +90,7 @@ public:
 
     void Setup() override
     {
-        engineParameters_[EP_WINDOW_TITLE] = "Sample";
+        engineParameters_[EP_WINDOW_TITLE] = "SparkDemo";
         engineParameters_[EP_FULL_SCREEN] = false;
         engineParameters_[EP_WINDOW_WIDTH] = 1280;
         engineParameters_[EP_WINDOW_HEIGHT] = 720;
@@ -360,8 +360,12 @@ private:
             GetSubsystem<Console>()->Toggle();
 
         // Toggle debug HUD with F2
-        else if (key == KEY_F2)
+        if (key == KEY_F2)
             GetSubsystem<DebugHud>()->ToggleAll();
+
+        // Check for pressing ESC.
+        if (key == KEY_ESCAPE)
+            engine_->Exit();
     }
 
     /// Build a simple fountain effect from scratch using spark library

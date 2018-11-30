@@ -52,13 +52,13 @@ private:
 
 
 
-class MyApp : public Application
+class ImguiDemo : public Application
 {
     SharedPtr<Scene> _scene;
 
 public:
 
-    MyApp(Context* context) :
+    ImguiDemo(Context* context) :
         Application(context)
     {
         context->RegisterFactory<Rotator>();
@@ -66,7 +66,7 @@ public:
 
     void Setup() override
     {
-        engineParameters_[EP_WINDOW_TITLE] = "Sample";
+        engineParameters_[EP_WINDOW_TITLE] = "ImguiDemo";
         engineParameters_[EP_FULL_SCREEN] = false;
         engineParameters_[EP_WINDOW_WIDTH] = 1280;
         engineParameters_[EP_WINDOW_HEIGHT] = 720;
@@ -81,26 +81,22 @@ public:
 
     void Start() override
     {
+        // SystemUI subsytem need to be registered after engine initialization
         context_->RegisterSubsystem(new SystemUI(context_));
-        context_->GetSubsystem<SystemUI>()->Start();
-
         context_->RegisterSubsystem(new DebugHud(context_));
+        context_->GetSubsystem<SystemUI>()->Start();
         context_->GetSubsystem<DebugHud>()->ToggleAll();
 
         ui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         ui::GetIO().BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
 
-
-        // Seems like the mouse must be in cursor mode before creating the UI or it won't work.
         GetSubsystem<Input>()->SetMouseVisible(true);
         GetSubsystem<Input>()->SetMouseGrabbed(false);
-
 
         ResourceCache* cache = GetSubsystem<ResourceCache>();
 
         _scene = new Scene(context_);
         _scene->CreateComponent<Octree>();
-        //_scene->CreateComponent<DebugRenderer>();
 
         Node* node = _scene->CreateChild("Box");
         node->SetPosition(Vector3(0,0,0));
@@ -112,7 +108,7 @@ public:
         rotator->SetRotationSpeed(Vector3(10.0f, 400.0f, 30.0f));
 
         Node* lightNode = _scene->CreateChild("DirectionalLight");
-        lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f)); // The direction vector does not need to be normalized
+        lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f));
         auto* light = lightNode->CreateComponent<Light>();
         light->SetLightType(LIGHT_DIRECTIONAL);
 
@@ -126,8 +122,8 @@ public:
         renderer->SetViewport(0, viewport);
 
         // Called after engine initialization. Setup application & subscribe to events here
-        SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(MyApp, HandleKeyDown));
-        SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(MyApp, HandleUpdate));
+        SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(ImguiDemo, HandleKeyDown));
+        SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(ImguiDemo, HandleUpdate));
     }    
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -143,14 +139,15 @@ public:
         ImGui::SliderFloat3("Axis", axis, -200.0f, 200.0f);
         ImGui::End();
 
+        // Update logic component using imgui values
         Rotator* rotator = _scene->GetChild("Box")->GetComponent<Rotator>();
         rotator->SetRotationSpeed(Vector3(axis));
-
     }
 
     void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     {
         using namespace KeyDown;
+
         // Check for pressing ESC. Note the engine_ member variable for convenience access to the Engine object
         int key = eventData[P_KEY].GetInt();
         if (key == KEY_ESCAPE)
@@ -158,7 +155,7 @@ public:
     }
 };
 
-URHO3D_DEFINE_APPLICATION_MAIN(MyApp)
+URHO3D_DEFINE_APPLICATION_MAIN(ImguiDemo)
 
 
 

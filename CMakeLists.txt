@@ -16,7 +16,7 @@ set(URHO3D_HOME CACHE PATH "Urho3D Build directory")
 if ("${URHO3D_HOME}" STREQUAL "")
     message(FATAL_ERROR "URHO3D_HOME variable is empty. Please set Urho3D build directory path.")
 endif()
-message(STATUS "Urho build directory : ${URHO3D_HOME}")
+message(STATUS "Urho3D build directory : ${URHO3D_HOME}")
 
 # include shared cmake macro
 include(CMake/global.cmake)
@@ -42,8 +42,7 @@ endif()
 
 
 add_subdirectory(Sources)
-#add_subdirectory(Samples)
-
+add_subdirectory(Samples)
 
 set(BUILD_TARGETS
     imgui
@@ -83,7 +82,6 @@ add_custom_command(
 
 add_custom_target(URHOX_LIB ALL DEPENDS ${URHOX_LIB_NAME})
 add_dependencies(URHOX_LIB ${BUILD_TARGETS})
-
 
 # Copy public headers to the output directory
 COPY_HEADERS(Sources/ThirdParty/ImGui/ ${OUT_DIR_INCLUDE}/Urhox/ThirdParty/ImGui)
