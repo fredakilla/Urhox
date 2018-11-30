@@ -50,8 +50,9 @@ private:
 
 
 
-
-
+/// ImguiDemo scene example.
+/// This sample demonstrates:
+///     - How to use ImGui library with Urho3D.
 class ImguiDemo : public Application
 {
     SharedPtr<Scene> _scene;
@@ -83,9 +84,14 @@ public:
     {
         // SystemUI subsytem need to be registered after engine initialization
         context_->RegisterSubsystem(new SystemUI(context_));
-        context_->RegisterSubsystem(new DebugHud(context_));
         context_->GetSubsystem<SystemUI>()->Start();
-        context_->GetSubsystem<DebugHud>()->ToggleAll();
+
+        // Load and show DebugHudEx (DebugHud imgui version)
+        context_->RegisterSubsystem(new DebugHudEx(context_));
+        context_->GetSubsystem<DebugHudEx>()->ToggleAll();
+
+        // Load ConsoleEx (Console imgui version)
+        context_->RegisterSubsystem(new ConsoleEx(context_));
 
         ui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         ui::GetIO().BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
@@ -144,7 +150,7 @@ public:
         rotator->SetRotationSpeed(Vector3(axis));
     }
 
-    void HandleKeyDown(StringHash eventType, VariantMap& eventData)
+    void HandleKeyDown(StringHash /*eventType*/, VariantMap& eventData)
     {
         using namespace KeyDown;
 
@@ -152,6 +158,14 @@ public:
         int key = eventData[P_KEY].GetInt();
         if (key == KEY_ESCAPE)
             engine_->Exit();
+
+        // Toggle console with F1
+        if (key == KEY_F1)
+            GetSubsystem<ConsoleEx>()->Toggle();
+
+        // Toggle debug HUD with F2
+        if (key == KEY_F2)
+            GetSubsystem<DebugHudEx>()->ToggleAll();
     }
 };
 

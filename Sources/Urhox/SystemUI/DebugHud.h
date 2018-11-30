@@ -39,15 +39,15 @@ enum DebugHudMode : unsigned
 URHO3D_FLAGSET(DebugHudMode, DebugHudModeFlags);
 
 /// Displays rendering stats and profiling information.
-class URHO3D_API DebugHud : public Object
+class URHO3D_API DebugHudEx : public Object
 {
-    URHO3D_OBJECT(DebugHud, Object)
+    URHO3D_OBJECT(DebugHudEx, Object)
 
 public:
     /// Construct.
-    explicit DebugHud(Context* context);
+    explicit DebugHudEx(Context* context);
     /// Destruct.
-    ~DebugHud() override;
+    ~DebugHudEx() override;
 
     /// Set elements to show.
     /// \param mode is a combination of DEBUGHUD_SHOW_* flags.

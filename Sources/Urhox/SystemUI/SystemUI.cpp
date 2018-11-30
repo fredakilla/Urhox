@@ -36,8 +36,6 @@
 #include <ImGuizmo/ImGuizmo.h>
 #include <ImGui/imgui_internal.h>
 
-#include "../UrhoxEvents.h"
-
 #define URHO3D_FALLTHROUGH
 
 using namespace std::placeholders;

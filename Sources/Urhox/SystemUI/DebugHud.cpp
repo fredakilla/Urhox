@@ -54,7 +54,7 @@ static const char* shadowQualityTexts[] =
 
 static const unsigned FPS_UPDATE_INTERVAL_MS = 500;
 
-DebugHud::DebugHud(Context* context) :
+DebugHudEx::DebugHudEx(Context* context) :
     Object(context),
     profilerMaxDepth_(M_MAX_UNSIGNED),
     profilerInterval_(1000),
@@ -63,21 +63,21 @@ DebugHud::DebugHud(Context* context) :
     fps_(0)
 {
     SetExtents();
-    SubscribeToEvent(E_UPDATE, std::bind(&DebugHud::RenderUi, this, std::placeholders::_2));
+    SubscribeToEvent(E_UPDATE, std::bind(&DebugHudEx::RenderUi, this, std::placeholders::_2));
 }
 
-DebugHud::~DebugHud()
+DebugHudEx::~DebugHudEx()
 {
     UnsubscribeFromAllEvents();
 }
 
-void DebugHud::SetExtents(const IntVector2& position, IntVector2 size)
+void DebugHudEx::SetExtents(const IntVector2& position, IntVector2 size)
 {
     if (size == IntVector2::ZERO)
     {
         size = { GetSubsystem<Graphics>()->GetWidth(), GetSubsystem<Graphics>()->GetHeight() };
         if (!HasSubscribedToEvent(E_SCREENMODE))
-            SubscribeToEvent(E_SCREENMODE, std::bind(&DebugHud::SetExtents, this, IntVector2::ZERO, IntVector2::ZERO));
+            SubscribeToEvent(E_SCREENMODE, std::bind(&DebugHudEx::SetExtents, this, IntVector2::ZERO, IntVector2::ZERO));
     }
     else
         UnsubscribeFromEvent(E_SCREENMODE);
@@ -86,12 +86,12 @@ void DebugHud::SetExtents(const IntVector2& position, IntVector2 size)
     extents_ = IntRect(position.x_, position.y_, bottomRight.x_, bottomRight.y_);
 }
 
-void DebugHud::SetMode(DebugHudModeFlags mode)
+void DebugHudEx::SetMode(DebugHudModeFlags mode)
 {
     mode_ = mode;
 }
 
-void DebugHud::CycleMode()
+void DebugHudEx::CycleMode()
 {
     switch (mode_.AsInteger())
     {
@@ -111,27 +111,27 @@ void DebugHud::CycleMode()
     }
 }
 
-void DebugHud::SetUseRendererStats(bool enable)
+void DebugHudEx::SetUseRendererStats(bool enable)
 {
     useRendererStats_ = enable;
 }
 
-void DebugHud::Toggle(DebugHudModeFlags mode)
+void DebugHudEx::Toggle(DebugHudModeFlags mode)
 {
     SetMode(GetMode() ^ mode);
 }
 
-void DebugHud::ToggleAll()
+void DebugHudEx::ToggleAll()
 {
     Toggle(DEBUGHUD_SHOW_ALL);
 }
 
-void DebugHud::SetAppStats(const String& label, const Variant& stats)
+void DebugHudEx::SetAppStats(const String& label, const Variant& stats)
 {
     SetAppStats(label, stats.ToString());
 }
 
-void DebugHud::SetAppStats(const String& label, const String& stats)
+void DebugHudEx::SetAppStats(const String& label, const String& stats)
 {
     bool newLabel = !appStats_.Contains(label);
     appStats_[label] = stats;
@@ -139,17 +139,17 @@ void DebugHud::SetAppStats(const String& label, const String& stats)
         appStats_.Sort();
 }
 
-bool DebugHud::ResetAppStats(const String& label)
+bool DebugHudEx::ResetAppStats(const String& label)
 {
     return appStats_.Erase(label);
 }
 
-void DebugHud::ClearAppStats()
+void DebugHudEx::ClearAppStats()
 {
     appStats_.Clear();
 }
 
-void DebugHud::RenderUi(VariantMap& eventData)
+void DebugHudEx::RenderUi(VariantMap& eventData)
 {
     Renderer* renderer = GetSubsystem<Renderer>();
     Graphics* graphics = GetSubsystem<Graphics>();

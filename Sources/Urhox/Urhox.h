@@ -1,6 +1,7 @@
 #pragma once
 
-#include "UrhoxEvents.h"
 #include "SystemUI/SystemUI.h"
+#include "SystemUI/DebugHud.h"
+#include "SystemUI/Console.h"
 #include "Spark/UrhoSpark.h"
 

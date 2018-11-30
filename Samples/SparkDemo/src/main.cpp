@@ -112,6 +112,9 @@ public:
         // Create the UI content
         CreateInstructions();
 
+        // Create console and debug HUD
+        CreateConsoleAndDebugHud();
+
         // Hook up to the frame update events
         SubscribeToEvents();
     }
@@ -286,6 +289,22 @@ private:
         instructionText->SetHorizontalAlignment(HA_CENTER);
         instructionText->SetVerticalAlignment(VA_CENTER);
         instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
+    }
+
+    void CreateConsoleAndDebugHud()
+    {
+        // Get default style
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        XMLFile* xmlFile = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
+
+        // Create console
+        Console* console = engine_->CreateConsole();
+        console->SetDefaultStyle(xmlFile);
+        console->GetBackground()->SetOpacity(0.8f);
+
+        // Create debug HUD.
+        DebugHud* debugHud = engine_->CreateDebugHud();
+        debugHud->SetDefaultStyle(xmlFile);
     }
 
     /// Read input and moves the camera.

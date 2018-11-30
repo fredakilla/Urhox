@@ -30,15 +30,15 @@ namespace Urho3D
 {
 
 /// %Console window with log history and command line prompt.
-class URHO3D_API Console : public Object
+class URHO3D_API ConsoleEx : public Object
 {
-    URHO3D_OBJECT(Console, Object);
+    URHO3D_OBJECT(ConsoleEx, Object);
 
 public:
     /// Construct.
-    Console(Context* context);
+    ConsoleEx(Context* context);
     /// Destruct.
-    ~Console();
+    ~ConsoleEx();
 
     /// Show or hide.
     void SetVisible(bool enable);

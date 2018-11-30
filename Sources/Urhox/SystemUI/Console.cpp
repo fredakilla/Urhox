@@ -42,7 +42,7 @@ namespace Urho3D
 
 static const int DEFAULT_HISTORY_SIZE = 512;
 
-Console::Console(Context* context) :
+ConsoleEx::ConsoleEx(Context* context) :
     Object(context),
     autoVisibleOnError_(false),
     historyRows_(DEFAULT_HISTORY_SIZE),
@@ -57,22 +57,22 @@ Console::Console(Context* context) :
     HandleScreenMode(nullptr, dummy);
     RefreshInterpreters();
 
-    SubscribeToEvent(E_SCREENMODE, URHO3D_HANDLER(Console, HandleScreenMode));
-    SubscribeToEvent(E_LOGMESSAGE, URHO3D_HANDLER(Console, HandleLogMessage));
+    SubscribeToEvent(E_SCREENMODE, URHO3D_HANDLER(ConsoleEx, HandleScreenMode));
+    SubscribeToEvent(E_LOGMESSAGE, URHO3D_HANDLER(ConsoleEx, HandleLogMessage));
 }
 
-Console::~Console()
+ConsoleEx::~ConsoleEx()
 {
     UnsubscribeFromAllEvents();
 }
 
-void Console::SetVisible(bool enable)
+void ConsoleEx::SetVisible(bool enable)
 {
     isOpen_ = enable;
     if (isOpen_)
     {
         focusInput_ = true;
-        SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Console, RenderUi));
+        SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(ConsoleEx, RenderUi));
     }
     else
     {
@@ -81,24 +81,24 @@ void Console::SetVisible(bool enable)
     }
 }
 
-void Console::Toggle()
+void ConsoleEx::Toggle()
 {
     SetVisible(!IsVisible());
 }
 
-void Console::SetNumHistoryRows(unsigned rows)
+void ConsoleEx::SetNumHistoryRows(unsigned rows)
 {
     historyRows_ = rows;
     if (history_.Size() > rows)
         history_.Resize(rows);
 }
 
-bool Console::IsVisible() const
+bool ConsoleEx::IsVisible() const
 {
     return isOpen_;
 }
 
-void Console::RefreshInterpreters()
+void ConsoleEx::RefreshInterpreters()
 {
     interpreters_.Clear();
     interpretersPointers_.Clear();
@@ -127,7 +127,7 @@ void Console::RefreshInterpreters()
         currentInterpreter_ = 0;
 }
 
-void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
+void ConsoleEx::HandleLogMessage(StringHash eventType, VariantMap& eventData)
 {
     using namespace LogMessage;
 
@@ -143,7 +143,7 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
         SetVisible(true);
 }
 
-void Console::RenderContent()
+void ConsoleEx::RenderContent()
 {
     auto region = ui::GetContentRegionAvail();
     auto showCommandInput = !interpretersPointers_.Empty();
@@ -225,7 +225,7 @@ void Console::RenderContent()
     }
 }
 
-void Console::RenderUi(StringHash eventType, VariantMap& eventData)
+void ConsoleEx::RenderUi(StringHash eventType, VariantMap& eventData)
 {
     Graphics* graphics = GetSubsystem<Graphics>();
     ui::SetNextWindowPos(ImVec2(0, 0));
@@ -254,12 +254,12 @@ void Console::RenderUi(StringHash eventType, VariantMap& eventData)
     ui::GetStyle().WindowRounding = old_rounding;
 }
 
-void Console::Clear()
+void ConsoleEx::Clear()
 {
     history_.Clear();
 }
 
-void Console::SetCommandInterpreter(const String& interpreter)
+void ConsoleEx::SetCommandInterpreter(const String& interpreter)
 {
     RefreshInterpreters();
 
@@ -269,7 +269,7 @@ void Console::SetCommandInterpreter(const String& interpreter)
     currentInterpreter_ = index;
 }
 
-void Console::HandleScreenMode(StringHash eventType, VariantMap& eventData)
+void ConsoleEx::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
     Graphics* graphics = GetSubsystem<Graphics>();
     windowSize_.x_ = Clamp(windowSize_.x_, 0, graphics->GetWidth());
