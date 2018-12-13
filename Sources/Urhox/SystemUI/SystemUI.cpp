@@ -36,8 +36,6 @@
 #include <ImGuizmo/ImGuizmo.h>
 #include <ImGui/imgui_internal.h>
 
-#define URHO3D_FALLTHROUGH
-
 using namespace std::placeholders;
 namespace Urho3D
 {
@@ -168,9 +166,7 @@ void SystemUI::OnRawEvent(VariantMap& args)
     case SDL_MOUSEWHEEL:
         io.MouseWheel = evt->wheel.y;
         break;
-    URHO3D_FALLTHROUGH
     case SDL_MOUSEBUTTONUP:
-    URHO3D_FALLTHROUGH
     case SDL_MOUSEBUTTONDOWN:
     {
         int imguiButton;
@@ -196,8 +192,9 @@ void SystemUI::OnRawEvent(VariantMap& args)
         }
         if (imguiButton >= 0)
             io.MouseDown[imguiButton] = evt->type == SDL_MOUSEBUTTONDOWN;
+
+        break;
     }
-    URHO3D_FALLTHROUGH
     case SDL_MOUSEMOTION:
         io.MousePos.x = evt->motion.x / uiZoom_;
         io.MousePos.y = evt->motion.y / uiZoom_;
@@ -206,9 +203,10 @@ void SystemUI::OnRawEvent(VariantMap& args)
         io.MouseDown[0] = false;
         io.MousePos.x = -1;
         io.MousePos.y = -1;
-    URHO3D_FALLTHROUGH
+        break;
     case SDL_FINGERDOWN:
         io.MouseDown[0] = true;
+        break;
     case SDL_FINGERMOTION:
         io.MousePos.x = evt->tfinger.x / uiZoom_;
         io.MousePos.y = evt->tfinger.y / uiZoom_;
