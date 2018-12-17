@@ -195,35 +195,37 @@ void Urho3DQuadRenderer::render(const Group& group,const DataSet* dataSet,Render
 
         const unsigned& color =  particle.getColor().getABGR() ;
 
-        dest[0] = v0.x;
-        dest[1] = v0.y;
-        dest[2] = v0.z;
-        ((unsigned&)dest[3]) = color;
-        dest[4] = _u0;
-        dest[5] = _v0;
+        short i = 0;
 
-        dest[6] = v1.x;
-        dest[7] = v1.y;
-        dest[8] = v1.z;
-        ((unsigned&)dest[9]) = color;
-        dest[10] = _u1;
-        dest[11] = _v0;
+        dest[i++] = v0.x;
+        dest[i++] = v0.y;
+        dest[i++] = v0.z;
+        ((unsigned&)dest[i++]) = color;
+        dest[i++] = _u0;
+        dest[i++] = _v0;
 
-        dest[12] = v2.x;
-        dest[13] = v2.y;
-        dest[14] = v2.z;
-        ((unsigned&)dest[15]) = color;
-        dest[16] = _u1;
-        dest[17] = _v1;
+        dest[i++] = v1.x;
+        dest[i++] = v1.y;
+        dest[i++] = v1.z;
+        ((unsigned&)dest[i++]) = color;
+        dest[i++] = _u1;
+        dest[i++] = _v0;
 
-        dest[18] = v3.x;
-        dest[19] = v3.y;
-        dest[20] = v3.z;
-        ((unsigned&)dest[21]) = color;
-        dest[22] = _u0;
-        dest[23] = _v1;
+        dest[i++] = v2.x;
+        dest[i++] = v2.y;
+        dest[i++] = v2.z;
+        ((unsigned&)dest[i++]) = color;
+        dest[i++] = _u1;
+        dest[i++] = _v1;
 
-        dest += 24;
+        dest[i++] = v3.x;
+        dest[i++] = v3.y;
+        dest[i++] = v3.z;
+        ((unsigned&)dest[i++]) = color;
+        dest[i++] = _u0;
+        dest[i++] = _v1;
+
+        dest += i;
     }
 
     vertexBuffer->Unlock();
